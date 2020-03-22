@@ -112,7 +112,7 @@ void encryptFile(string filename)
 	{
 		for (size_t i = 0; i < line.size(); i++)
 		{
-			line[i] += 4;
+				line[i] += 4;
 		}
 		out << line;
 	}
@@ -161,36 +161,49 @@ void decryptFile(string filename)
 
 	string line;
 
+	in >> line;
+
+	int space = 32;
+
 	for (size_t i = 0; i < line.size(); i++)
 	{
-		line[i] -= 4;
+		if (line[i] == '$')
+		{
+			line.insert(i + 1, "\xA0");
+			line.erase(i, 1);
+		}
+		else
+		{
+			line[i] -= 4;
+		}
 	}
 
+	out << line;
+
 	in.close();
-	out.close();
-	ifstream fin(filename2.c_str());
-	ofstream fout(filename1.c_str());
+	out.close(); 
+	remove(filename1.c_str());
+	rename(filename2.c_str(),filename1.c_str());
 
-	fout << line;
-	fin.close();
-	fout.close();
-
-	remove(filename2.c_str());
 	cout << "File decrypted!\n";
 }
 
 void deleteFromList(string filename)
 {
-	string filename1 = filename + ".txt";
+	string name = "encryptedFiles";
+
+	string filename1 = name + ".txt";
 	ifstream in(filename1.c_str());
 
-	string filename2 = filename + "1.txt";
+	string filename2 = name + "1.txt";
 	ofstream out(filename2.c_str());
+
+	filename += ".txt";
 
 	string aux;
 	while (in >> aux)
 	{
-		if (aux != filename1)
+		if (aux != filename)
 			out << aux << endl;
 
 	}
@@ -218,7 +231,7 @@ void decryptMenu()
 		string filename;
 		cin >> filename;
 		decryptFile(filename);
-		deleteFromList(filename);
+		deleteFromList("filename");
 	}
 	else
 	{
@@ -235,7 +248,7 @@ void menu()
 	cout << "2.Insert password to access the secure content\n";
 	cout << "3.Encrypt a file\n";
 	cout << "4.Decrypt a file\n";
-	cout << "99.Exit\n";
+	cout << "5.Exit\n";
 
 	int opt;
 	cin >> opt;
@@ -253,7 +266,7 @@ void menu()
 	case 4:
 		decryptMenu();
 		break;
-	case 99:
+	case 5:
 		isRunning = false;
 		break;
 	default:
